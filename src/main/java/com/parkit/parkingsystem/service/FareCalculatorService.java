@@ -15,7 +15,7 @@ public class FareCalculatorService {
         long inHour = ticket.getInTime().getTime();
         long outHour = ticket.getOutTime().getTime();
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
+        //TODO: Some tests are failing here. Need to check if this logic is correct - done
         double duration = (outHour - inHour)*(1/3.6)*1e-6;
         
         switch (ticket.getParkingSpot().getParkingType()){
