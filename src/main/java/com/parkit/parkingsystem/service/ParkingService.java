@@ -98,12 +98,17 @@ public class ParkingService {
     }
 
     public void processExitingVehicle() {
-        try{
+        try{	
             String vehicleRegNumber = getVehichleRegNumber();
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
+            System.out.println(ticket.getId());
+            System.out.println(ticket.getVehicleRegNumber());
             Date outTime = new Date();
             ticket.setOutTime(outTime);
+            
             fareCalculatorService.calculateFare(ticket);
+           // System.out.println("before if");
+            System.out.println(vehicleRegNumber);
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
