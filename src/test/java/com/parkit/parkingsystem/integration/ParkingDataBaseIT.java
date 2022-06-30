@@ -40,12 +40,9 @@ public class ParkingDataBaseIT {
     private static TicketDAO ticketDAO;
     private static DataBasePrepareService dataBasePrepareService;
    
-
-
     @Mock
     private static InputReaderUtil inputReaderUtil;
-   
-
+ 
     @BeforeAll
     private static void setUp() throws Exception {
         parkingSpotDAO = new ParkingSpotDAO();
@@ -64,13 +61,10 @@ public class ParkingDataBaseIT {
     }
 
     @AfterAll
-    private static void tearDown(){
-
-    }
-    
+    private static void tearDown(){}
     
     @Test
-    public void testParkingACar(){
+    public void testParkingACar() {
     	//WHEN
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
@@ -82,10 +76,8 @@ public class ParkingDataBaseIT {
         assertEquals(false, sut2);
     }
     
-    
-
     @Test
-    public void testParkingLotExit(){
+    public void testParkingLotExit() {
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processExitingVehicle();
         Ticket ticket = ticketDAO.getTicket("ABCDEF");
@@ -106,8 +98,6 @@ public class ParkingDataBaseIT {
       
         assertEquals(strDateEx,strDateReal);
         assertEquals(exPrice,realPrice,eps);
-         
-        //TODO: check that the fare generated and out time are populated correctly in the database
     }
 
 
