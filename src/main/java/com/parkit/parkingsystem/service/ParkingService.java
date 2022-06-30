@@ -8,20 +8,17 @@ import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.util.Date;
 
 public class ParkingService {
 
     private static final Logger logger = LogManager.getLogger("ParkingService");
-
     private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
-
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
     private  TicketDAO ticketDAO;
 
-    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
+    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO) {
         this.inputReaderUtil = inputReaderUtil;
         this.parkingSpotDAO = parkingSpotDAO;
         this.ticketDAO = ticketDAO;
@@ -107,8 +104,8 @@ public class ParkingService {
             ticket.setOutTime(outTime);
             
             fareCalculatorService.calculateFare(ticket);
-           // System.out.println("before if");
             System.out.println(vehicleRegNumber);
+            
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
