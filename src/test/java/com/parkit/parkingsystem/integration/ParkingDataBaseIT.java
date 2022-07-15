@@ -38,7 +38,9 @@ public class ParkingDataBaseIT {
    
     @Mock
     private static InputReaderUtil inputReaderUtil;
- 
+
+   
+
     @BeforeAll
     private static void setUp() throws Exception {
         parkingSpotDAO = new ParkingSpotDAO();
@@ -57,8 +59,11 @@ public class ParkingDataBaseIT {
     }
 
     @AfterAll
-    private static void tearDown(){}
-    
+
+    private static void tearDown() {
+
+    }
+
     @Test
     public void testParkingACar() {
     	//WHEN
@@ -68,6 +73,7 @@ public class ParkingDataBaseIT {
         Ticket ticket = ticketDAO.getTicket("ABCDEF");
         String sut = ticket.getVehicleRegNumber();
         Boolean sut2 = ticket.getParkingSpot().isAvailable();
+        
         assertEquals("ABCDEF", sut);
         assertEquals(false, sut2);
     }
@@ -75,16 +81,19 @@ public class ParkingDataBaseIT {
     @Test
     public void testParkingLotExit() {
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        parkingService.processExitingVehicle();
+        parkingService.processIncomingVehicle();
         Ticket ticket = ticketDAO.getTicket("ABCDEF");
-        
-        DateFormat dateFormatUsed = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+        String sut = ticket.getVehicleRegNumber();
+        parkingService.processExitingVehicle();
+        Double sut = ticket.getPrice();
+        assertEquals(0 , sut );
         Date outTime = new Date();
-        Date outTimeNearestMin = DateUtils.round(outTime, Calendar.MINUTE);
-        String strDateEx = dateFormatUsed.format(outTimeNearestMin);
-        Date realTime = ticket.getOutTime();
-        Date realTimeNearestMin=DateUtils.round(realTime, Calendar.MINUTE);
-        String strDateReal = dateFormatUsed.format(realTimeNearestMin);
+
+        Timestamp expectedDate = new Timestamp(1000 *((outTime.getTime())/1000));
+        Date sut2 = ticket.getOutTime();
+        assertEquals(expectedDate, sut2);
+
+
         
         Double realPrice=ticket.getPrice();
         long inTime=ticket.getInTime().getTime();
@@ -92,10 +101,9 @@ public class ParkingDataBaseIT {
         Double exPrice = 1.5*(duration*(1/3.6)*1e-6);
         double eps = 1e-03;
       
-        assertEquals(strDateEx,strDateReal);
+        
         assertEquals(exPrice,realPrice,eps);
+
     }
-
-
 
 }
