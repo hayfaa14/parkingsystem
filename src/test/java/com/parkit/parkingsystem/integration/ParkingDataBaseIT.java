@@ -28,6 +28,7 @@ import java.util.Date;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
+
 public class ParkingDataBaseIT {
 
     private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
@@ -37,7 +38,9 @@ public class ParkingDataBaseIT {
    
     @Mock
     private static InputReaderUtil inputReaderUtil;
+
    
+
     @BeforeAll
     private static void setUp() throws Exception {
         parkingSpotDAO = new ParkingSpotDAO();
@@ -56,9 +59,11 @@ public class ParkingDataBaseIT {
     }
 
     @AfterAll
+
     private static void tearDown() {
 
     }
+
     @Test
     public void testParkingACar() {
     	//WHEN
@@ -83,9 +88,22 @@ public class ParkingDataBaseIT {
         Double sut = ticket.getPrice();
         assertEquals(0 , sut );
         Date outTime = new Date();
+
         Timestamp expectedDate = new Timestamp(1000 *((outTime.getTime())/1000));
         Date sut2 = ticket.getOutTime();
         assertEquals(expectedDate, sut2);
+
+
+        
+        Double realPrice=ticket.getPrice();
+        long inTime=ticket.getInTime().getTime();
+        long duration=outTime.getTime()-inTime;
+        Double exPrice = 1.5*(duration*(1/3.6)*1e-6);
+        double eps = 1e-03;
+      
+        
+        assertEquals(exPrice,realPrice,eps);
+
     }
 
 }

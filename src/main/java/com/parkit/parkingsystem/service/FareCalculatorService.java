@@ -14,6 +14,11 @@ public class FareCalculatorService {
         long inHour = ticket.getInTime().getTime();
         long outHour = ticket.getOutTime().getTime();
         double duration = (outHour - inHour)*(1/3.6)*1e-6;
+        System.out.print(duration);
+        
+        if(duration<0.5) {
+        	ticket.setPrice(0.0);
+        }else {
         
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
@@ -26,5 +31,6 @@ public class FareCalculatorService {
             }
             default: throw new IllegalArgumentException("Unkown Parking Type");
         }
+      }
     }
 }

@@ -21,7 +21,9 @@ public class TicketDAO {
 
     @SuppressWarnings("finally")
 	public boolean saveTicket(Ticket ticket) {
+
         Connection connection = null;
+
         try {
             connection = dataBaseConfig.getConnection();
             PreparedStatement ps = connection.prepareStatement(DBConstants.SAVE_TICKET);
