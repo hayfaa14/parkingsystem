@@ -13,18 +13,21 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.*;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -38,8 +41,8 @@ public class ParkingDataBaseIT {
    
     @Mock
     private static InputReaderUtil inputReaderUtil;
+    private String regNumberTested="WXYZ";
 
-   
 
     @BeforeAll
     private static void setUp() throws Exception {
@@ -52,8 +55,8 @@ public class ParkingDataBaseIT {
 
     @BeforeEach
     private void setUpPerTest() throws Exception {
-        when(inputReaderUtil.readSelection()).thenReturn(2);
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(regNumberTested);
        // dataBasePrepareService.clearDataBaseEntries();
         
     }
@@ -70,40 +73,37 @@ public class ParkingDataBaseIT {
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
 
-        Ticket ticket = ticketDAO.getTicket("ABCDEF");
+        Ticket ticket = ticketDAO.getTicket(regNumberTested);
         String sut = ticket.getVehicleRegNumber();
         Boolean sut2 = ticket.getParkingSpot().isAvailable();
         
-        assertEquals("ABCDEF", sut);
+        assertEquals(regNumberTested, sut);
         assertEquals(false, sut2);
     }
     
     @Test
     public void testParkingLotExit() {
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        parkingService.processIncomingVehicle();
-        Ticket ticket = ticketDAO.getTicket("ABCDEF");
-        String sut = ticket.getVehicleRegNumber();
-        parkingService.processExitingVehicle();
-        Double sut = ticket.getPrice();
-        assertEquals(0 , sut );
-        Date outTime = new Date();
-
-        Timestamp expectedDate = new Timestamp(1000 *((outTime.getTime())/1000));
-        Date sut2 = ticket.getOutTime();
-        assertEquals(expectedDate, sut2);
-
-
-        
-        Double realPrice=ticket.getPrice();
-        long inTime=ticket.getInTime().getTime();
-        long duration=outTime.getTime()-inTime;
-        Double exPrice = 1.5*(duration*(1/3.6)*1e-6);
-        double eps = 1e-03;
-      
-        
-        assertEquals(exPrice,realPrice,eps);
-
+    	 ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+         parkingService.processExitingVehicle();
+         Ticket ticket = ticketDAO.getTicket(regNumberTested);
+         
+         DateFormat dateFormatUsed = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+         Date outTime = new Date();
+         Date outTimeNearestMin = DateUtils.round(outTime, Calendar.MINUTE);
+         String strDateEx = dateFormatUsed.format(outTimeNearestMin);
+         Date realTime = ticket.getOutTime();
+         Date realTimeNearestMin=DateUtils.round(realTime, Calendar.MINUTE);
+         String strDateReal = dateFormatUsed.format(realTimeNearestMin);
+         
+         Double realPrice=ticket.getPrice();
+         long inTime=ticket.getInTime().getTime();
+         long duration=outTime.getTime()-inTime;
+         Long exPrice1 =Math.round(1.5*(duration*(1/3.6)*1e-6));
+         Double exPrice =exPrice1.doubleValue();
+         double eps = 1e-03;
+       
+         assertEquals(strDateEx,strDateReal);
+         assertEquals(exPrice,realPrice,eps);
     }
 
 }
