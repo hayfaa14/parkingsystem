@@ -14,14 +14,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
+
+
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +52,13 @@ public class ParkingDataBaseIT {
     private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
-    private static DataBasePrepareService dataBasePrepareService;
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+    
+
+   // private static DataBasePrepareService dataBasePrepareService;
+    
+   
    
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -50,7 +71,7 @@ public class ParkingDataBaseIT {
         parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
         ticketDAO = new TicketDAO();
         ticketDAO.dataBaseConfig = dataBaseTestConfig;
-        dataBasePrepareService = new DataBasePrepareService();
+      //  dataBasePrepareService = new DataBasePrepareService();
     }
 
     @BeforeEach
@@ -70,15 +91,32 @@ public class ParkingDataBaseIT {
     @Test
     public void testParkingACar() {
     	//WHEN
+    	
+    	when(inputReaderUtil.readSelection()).thenReturn(1);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
 
         Ticket ticket = ticketDAO.getTicket(regNumberTested);
         String sut = ticket.getVehicleRegNumber();
         Boolean sut2 = ticket.getParkingSpot().isAvailable();
-        
+
+ 
         assertEquals(regNumberTested, sut);
         assertEquals(false, sut2);
+
+    }
+    
+    @Test
+    public void testParkingACarRecurringUser() {
+    	//WHEN
+    	System.setOut(new PrintStream(outputStreamCaptor));
+    	when(inputReaderUtil.readSelection()).thenReturn(1);
+        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService.processIncomingVehicle();
+        assertEquals("Hello Baeldung Readers!!", outputStreamCaptor.toString()
+          .trim());
+        
+
     }
     
     @Test
@@ -94,6 +132,7 @@ public class ParkingDataBaseIT {
          Date realTime = ticket.getOutTime();
          Date realTimeNearestMin=DateUtils.round(realTime, Calendar.MINUTE);
          String strDateReal = dateFormatUsed.format(realTimeNearestMin);
+
          
          Double realPrice=ticket.getPrice();
          long inTime=ticket.getInTime().getTime();
@@ -106,4 +145,8 @@ public class ParkingDataBaseIT {
          assertEquals(exPrice,realPrice,eps);
     }
 
+    
+    
+
 }
+

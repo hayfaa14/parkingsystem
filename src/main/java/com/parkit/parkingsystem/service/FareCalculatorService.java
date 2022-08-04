@@ -33,4 +33,16 @@ public class FareCalculatorService {
         }
       }
     }
+
+
+
+    
+    public void calculateFareRecurringUser(Ticket ticket) {
+    	calculateFare(ticket);
+    	double discount=0.05*ticket.getPrice();
+    	ticket.setPrice(ticket.getPrice()-discount);
+    }
+    
+    
 }
+

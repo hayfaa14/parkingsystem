@@ -7,15 +7,18 @@ import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.FareCalculatorService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.text.DecimalFormat;
+
 import java.util.Date;
 
 public class FareCalculatorServiceTest {
 
     private static FareCalculatorService fareCalculatorService;
     private Ticket ticket;
+    
 
     @BeforeAll
     private static void setUp() {
@@ -126,6 +129,7 @@ public class FareCalculatorServiceTest {
     }
     
     @Test
+
     public void calculateFareCarUnder30Minutes() {
     	
     	Date inTime = new Date();
@@ -155,5 +159,27 @@ public class FareCalculatorServiceTest {
     	
     	assertEquals(0,ticket.getPrice());
     }
+
+    
+    public void calculateFareRecurringUser() {
+    	
+        Date inTime = new Date();
+        inTime.setTime( System.currentTimeMillis() - (  60 * 60 * 1000) );
+        Date outTime = new Date();
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        fareCalculatorService.calculateFareRecurringUser(ticket);
+        DecimalFormat df = new DecimalFormat("#.###");
+        String expectedPrice=df.format(0.95*Fare.CAR_RATE_PER_HOUR);
+        
+        assertEquals(Double.parseDouble(expectedPrice),ticket.getPrice());
+    	
+    	
+    }
+    
+
 
 }
