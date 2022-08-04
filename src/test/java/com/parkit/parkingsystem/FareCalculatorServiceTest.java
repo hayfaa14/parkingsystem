@@ -160,7 +160,7 @@ public class FareCalculatorServiceTest {
     	assertEquals(0,ticket.getPrice());
     }
 
-    
+    @Test
     public void calculateFareRecurringUser() {
     	
         Date inTime = new Date();

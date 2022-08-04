@@ -23,22 +23,8 @@ import org.mockito.quality.Strictness;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
-
-
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import java.text.DateFormat;
-import java.text.DecimalFormat;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,17 +38,14 @@ public class ParkingDataBaseIT {
     private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
-    private final PrintStream standardOut = System.out;
-    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
-    
 
-   // private static DataBasePrepareService dataBasePrepareService;
+    private static DataBasePrepareService dataBasePrepareService;
     
    
    
     @Mock
     private static InputReaderUtil inputReaderUtil;
-    private String regNumberTested="WXYZ";
+    private String regNumberTested="UVWXYZ";
 
 
     @BeforeAll
@@ -70,15 +53,15 @@ public class ParkingDataBaseIT {
         parkingSpotDAO = new ParkingSpotDAO();
         parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
         ticketDAO = new TicketDAO();
-        ticketDAO.dataBaseConfig = dataBaseTestConfig;
-      //  dataBasePrepareService = new DataBasePrepareService();
+     //   ticketDAO.dataBaseConfig = dataBaseTestConfig;
+       dataBasePrepareService = new DataBasePrepareService();
     }
 
     @BeforeEach
     private void setUpPerTest() throws Exception {
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(regNumberTested);
-       // dataBasePrepareService.clearDataBaseEntries();
+        
         
     }
 
@@ -92,7 +75,6 @@ public class ParkingDataBaseIT {
     public void testParkingACar() {
     	//WHEN
     	
-    	when(inputReaderUtil.readSelection()).thenReturn(1);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
 
@@ -106,18 +88,17 @@ public class ParkingDataBaseIT {
 
     }
     
+    /**
     @Test
     public void testParkingACarRecurringUser() {
     	//WHEN
-    	System.setOut(new PrintStream(outputStreamCaptor));
     	when(inputReaderUtil.readSelection()).thenReturn(1);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
-        assertEquals("Hello Baeldung Readers!!", outputStreamCaptor.toString()
-          .trim());
+        assertTrue(parkingService.recurringUser);
         
 
-    }
+    }**/
     
     @Test
     public void testParkingLotExit() {

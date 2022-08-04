@@ -73,13 +73,6 @@ public class ParkingServiceTest {
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
     
-    @Test
-    public void processEnteringVehicleRecurringUserTest() {
-    	System.setOut(new PrintStream(outContent));
-    	parkingService.processIncomingVehicle();
-        assertEquals("hello", outContent.toString());
-		
-    }
-    
+   
 
 }
