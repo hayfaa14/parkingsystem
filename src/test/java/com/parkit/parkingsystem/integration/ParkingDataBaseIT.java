@@ -19,10 +19,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -38,7 +44,13 @@ public class ParkingDataBaseIT {
     private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
-    private static DataBasePrepareService dataBasePrepareService;
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+    
+
+   // private static DataBasePrepareService dataBasePrepareService;
+    
+   
    
 
 
@@ -52,14 +64,14 @@ public class ParkingDataBaseIT {
         parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
         ticketDAO = new TicketDAO();
         ticketDAO.dataBaseConfig = dataBaseTestConfig;
-        dataBasePrepareService = new DataBasePrepareService();
+      //  dataBasePrepareService = new DataBasePrepareService();
     }
 
     @BeforeEach
     private void setUpPerTest() throws Exception {
-        when(inputReaderUtil.readSelection()).thenReturn(2);
+    	//dataBasePrepareService.clearDataBaseEntries();
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-       // dataBasePrepareService.clearDataBaseEntries();
+        
         
     }
 
@@ -70,22 +82,38 @@ public class ParkingDataBaseIT {
     
     
     @Test
-    public void testParkingACar(){
+    public void testParkingACar() {
     	//WHEN
+    	
+    	when(inputReaderUtil.readSelection()).thenReturn(1);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
 
         Ticket ticket = ticketDAO.getTicket("ABCDEF");
         String sut = ticket.getVehicleRegNumber();
         Boolean sut2 = ticket.getParkingSpot().isAvailable();
-        assertEquals("ABCDEF", sut);
-        assertEquals(false, sut2);
+        assertEquals(sut,"ABCDEF");
+        assertFalse(sut2);
+    }
+    
+    @Test
+    public void testParkingACarRecurringUser() {
+    	//WHEN
+    	System.setOut(new PrintStream(outputStreamCaptor));
+    	when(inputReaderUtil.readSelection()).thenReturn(1);
+        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService.processIncomingVehicle();
+        assertEquals("Hello Baeldung Readers!!", outputStreamCaptor.toString()
+          .trim());
+        
     }
     
     
 
     @Test
     public void testParkingLotExit(){
+    	
+    	when(inputReaderUtil.readSelection()).thenReturn(2);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processExitingVehicle();
         Ticket ticket = ticketDAO.getTicket("ABCDEF");
@@ -106,10 +134,11 @@ public class ParkingDataBaseIT {
       
         assertEquals(strDateEx,strDateReal);
         assertEquals(exPrice,realPrice,eps);
+        
          
         //TODO: check that the fare generated and out time are populated correctly in the database
     }
-
-
-
+    
+    
 }
+
