@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Bug pattern="DMI_CONSTANT_DB_PASSWORD,EI_EXPOSE_REP,EI_EXPOSE_REP2,DM_DEFAULT_ENCODING"/>
+    </Match>
+</FindBugsFilter>
